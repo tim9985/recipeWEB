@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>식약처 레시피 가이드</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape bg-1"></div>
+    <div class="bg-shape bg-2"></div>
+    <header class="hero">
+      <div class="hero-inner">
+        <p class="kicker">KOREA FOOD SAFETY RECIPE API</p>
+        <h1>식약처 조리식품 레시피 탐색기</h1>
+        <p class="subtitle">요리법, 영양정보, 재료, 조리단계 이미지까지 API 원문 필드를 그대로 확인하고 검색하세요.</p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="panel controls">
+        <div class="control-grid">
+          <label>
+            <span>통합 검색</span>
+            <input id="q" type="text" placeholder="레시피명, 재료, 해시태그, 팁 검색" />
+          </label>
+
+          <label>
+            <span>조리방법</span>
+            <select id="way"></select>
+          </label>
+
+          <label>
+            <span>요리유형</span>
+            <select id="pat"></select>
+          </label>
+
+          <label>
+            <span>정렬</span>
+            <select id="sort">
+              <option value="name_asc">이름 오름차순</option>
+              <option value="name_desc">이름 내림차순</option>
+              <option value="cal_asc">열량 낮은 순</option>
+              <option value="cal_desc">열량 높은 순</option>
+            </select>
+          </label>
+
+          <label>
+            <span>페이지 크기</span>
+            <select id="pageSize">
+              <option>12</option>
+              <option>24</option>
+              <option>48</option>
+              <option>100</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="searchBtn" class="btn primary">검색 적용</button>
+          <button id="resetBtn" class="btn">초기화</button>
+          <button id="randomBtn" class="btn">랜덤 추천</button>
+          <button id="refreshBtn" class="btn">API 캐시 새로고침</button>
+          <button id="downloadBtn" class="btn">현재 결과 JSON 저장</button>
+        </div>
+      </section>
+
+      <section class="panel pantry-panel">
+        <h2 class="section-title-inline">내 식재료 보관함</h2>
+        <form id="pantryForm" class="pantry-form">
+          <label>
+            <span>식재료명</span>
+            <input id="ingredientName" required type="text" placeholder="예: 양파" />
+          </label>
+          <label>
+            <span>수량 텍스트</span>
+            <input id="quantityText" required type="text" placeholder="예: 2개(300g), 100g" />
+          </label>
+          <label>
+            <span>숫자 수량(선택)</span>
+            <input id="quantityValue" type="number" step="0.001" placeholder="예: 2" />
+          </label>
+          <label>
+            <span>단위(선택)</span>
+            <input id="unit" type="text" placeholder="예: 개, g, ml" />
+          </label>
+          <label>
+            <span>구매일자</span>
+            <input id="purchaseDate" required type="date" />
+          </label>
+          <label>
+            <span>유통기한(선택)</span>
+            <input id="expiryDate" type="date" />
+          </label>
+          <label class="memo-field">
+            <span>메모(선택)</span>
+            <input id="memo" type="text" placeholder="예: 냉장실 보관" />
+          </label>
+          <button class="btn primary" type="submit">재료 등록</button>
+        </form>
+
+        <div class="button-row">
+          <button id="recommendByPantryBtn" class="btn">보유 재료 기반 추천</button>
+          <button id="recommendByOllamaBtn" class="btn primary">Ollama 메뉴 추천</button>
+          <button id="showAllRecipesBtn" class="btn">전체 검색으로 복귀</button>
+        </div>
+
+        <div class="prompt-recommend-wrap">
+          <label for="ingredientsPromptInput" class="prompt-label">직접 입력 재료로 추천</label>
+          <div class="prompt-row">
+            <input
+              id="ingredientsPromptInput"
+              type="text"
+              placeholder="예: 사과 1개, 무 300g, 양파 2개"
+            />
+            <button id="recommendByPromptBtn" class="btn primary">입력 재료 추천</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="raw-table pantry-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>식재료</th>
+                <th>수량</th>
+                <th>구매일</th>
+                <th>유통기한</th>
+                <th>메모</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="pantryBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel nutrition-panel">
+        <h2 class="section-title-inline">1일 섭취량 확인</h2>
+        <form id="nutritionForm" class="nutrition-form">
+          <label>
+            <span>성별</span>
+            <select id="sex">
+              <option value="male">남성</option>
+              <option value="female">여성</option>
+            </select>
+          </label>
+          <label>
+            <span>나이</span>
+            <input id="age" type="number" min="1" max="120" value="30" />
+          </label>
+          <label>
+            <span>키(cm)</span>
+            <input id="height" type="number" min="100" max="220" value="170" />
+          </label>
+          <label>
+            <span>체중(kg)</span>
+            <input id="weight" type="number" min="20" max="200" value="70" />
+          </label>
+          <label>
+            <span>목표</span>
+            <select id="goal">
+              <option value="maintain">유지</option>
+              <option value="bulk">벌크업</option>
+              <option value="diet">다이어트</option>
+            </select>
+          </label>
+          <button class="btn primary" id="nutritionSubmitBtn" type="submit">섭취량 계산</button>
+        </form>
+        <div id="nutritionResult" class="result-box">성별, 나이, 키, 체중, 목표를 입력하면 1일 섭취량이 표시됩니다.</div>
+      </section>
+
+      <section class="panel shopping-panel">
+        <h2 class="section-title-inline">장바구니 / 사야 될 리스트</h2>
+        <form id="shoppingForm" class="shopping-form">
+          <label>
+            <span>품목명</span>
+            <input id="shoppingName" type="text" placeholder="예: 양파" />
+          </label>
+          <label>
+            <span>수량 메모</span>
+            <input id="shoppingQuantity" type="text" placeholder="예: 2개, 300g" />
+          </label>
+          <label class="memo-field">
+            <span>메모</span>
+            <input id="shoppingMemo" type="text" placeholder="예: 할인할 때 구매" />
+          </label>
+          <button class="btn primary" type="submit">장바구니 추가</button>
+        </form>
+        <div class="table-wrap">
+          <table class="raw-table shopping-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>품목명</th>
+                <th>수량</th>
+                <th>메모</th>
+                <th>상태</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="shoppingBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel timer-panel">
+        <h2 class="section-title-inline">조리 타이머</h2>
+        <div class="timer-wrap">
+          <input id="timerInput" type="text" placeholder="예: 3분 20초, 45초, 1시간 5분" />
+          <div class="timer-display" id="timerDisplay">00:00:00</div>
+          <div class="button-row">
+            <button id="timerStartBtn" class="btn primary" type="button">시작</button>
+            <button id="timerPauseBtn" class="btn" type="button">일시정지</button>
+            <button id="timerResetBtn" class="btn" type="button">초기화</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel seasonal-panel">
+        <h2 class="section-title-inline">제철 식재료 추천</h2>
+        <div class="button-row seasonal-row">
+          <label class="seasonal-select">
+            <span>월 선택</span>
+            <select id="seasonalMonth">
+              <option value="1">1월</option>
+              <option value="2">2월</option>
+              <option value="3">3월</option>
+              <option value="4">4월</option>
+              <option value="5">5월</option>
+              <option value="6">6월</option>
+              <option value="7">7월</option>
+              <option value="8">8월</option>
+              <option value="9">9월</option>
+              <option value="10">10월</option>
+              <option value="11">11월</option>
+              <option value="12">12월</option>
+            </select>
+          </label>
+          <button id="seasonalRefreshBtn" class="btn primary" type="button">제철 추천 갱신</button>
+        </div>
+        <p id="seasonalInfo" class="seasonal-info">월을 선택하면 제철 식재료 기반 레시피가 표시됩니다.</p>
+        <section class="card-grid seasonal-grid" id="seasonalGrid"></section>
+      </section>
+
+      <section class="panel stats" id="stats"></section>
+
+      <section class="card-grid" id="cardGrid"></section>
+
+      <section class="pagination panel">
+        <button id="prevBtn" class="btn">이전</button>
+        <span id="pageInfo"></span>
+        <button id="nextBtn" class="btn">다음</button>
+      </section>
+    </main>
+
+    <dialog id="detailDialog" class="detail-dialog">
+      <button id="closeDialog" class="close-btn" aria-label="닫기">×</button>
+      <div id="detailContent"></div>
+    </dialog>
+
+    <template id="cardTemplate">
+      <article class="recipe-card">
+        <img class="recipe-image" alt="" />
+        <div class="recipe-body">
+          <p class="meta"></p>
+          <h3 class="title"></h3>
+          <p class="nutri"></p>
+          <p class="tags"></p>
+          <button class="btn small detail-btn">상세 보기</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+[
+  {
+    "id": 7,
+    "ingredientName": "레몬",
+    "quantityText": "1개",
+    "quantityValue": null,
+    "unit": null,
+    "purchaseDate": "2026-04-15",
+    "expiryDate": null,
+    "memo": "냉장보관",
+    "createdAt": "2026-04-15T13:43:57.366Z",
+    "updatedAt": "2026-04-15T13:43:57.366Z"
+  },
+  {
+    "id": 8,
+    "ingredientName": "감자",
+    "quantityText": "2개 (300g)",
+    "quantityValue": 1,
+    "unit": null,
+    "purchaseDate": "2026-04-12",
+    "expiryDate": null,
+    "memo": "냉장고",
+    "createdAt": "2026-04-15T14:23:43.319Z",
+    "updatedAt": "2026-04-15T14:23:43.319Z"
+  }
+]
