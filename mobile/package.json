@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "expo": "~54.0.0",
-    "expo-router": "^1.0.0",
+    "expo-router": "5.1.11",
     "react": "18.2.0",
     "react-native": "0.71.8",
     "nativewind": "^4.0.0",
@@ -19,8 +19,8 @@
     "react-native-reanimated": "~2.14.4",
     "react-native-gesture-handler": "~2.9.0",
     "@gorhom/bottom-sheet": "^4.4.0",
-    "lucide-react-native": "^0.0.0",
-    "react-native-gifted-charts": "^0.6.0"
+    "lucide-react-native": "^1.14.0",
+    "react-native-gifted-charts": "^1.4.76"
   },
   "devDependencies": {
     "typescript": "^5.4.2",
