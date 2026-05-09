@@ -1,0 +1,4 @@
+[
+  { "id": "ing-1", "name": "Tomato", "category": "VEGETABLE", "expirationDate": "2026-05-20T00:00:00.000Z", "isExpiringSoon": false },
+  { "id": "ing-2", "name": "Egg", "category": "ETC", "expirationDate": "2026-05-12T00:00:00.000Z", "isExpiringSoon": true }
+]
